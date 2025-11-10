@@ -23,9 +23,7 @@
         <sonar.organization>juancamiloarboleda</sonar.organization>
         <sonar.projectKey>JuanCamiloArboleda_InnoSistemas---P4F5_copy</sonar.projectKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        
-        <!-- Configuración de métricas de complejidad -->
-        <sonar.complexity.threshold>10</sonar.complexity.threshold>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>

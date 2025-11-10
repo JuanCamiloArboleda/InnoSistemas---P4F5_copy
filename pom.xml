@@ -25,6 +25,8 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <!-- Configuración de cobertura -->
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <!-- Rutas necesarias para mapear cobertura -->
+        <sonar.java.binaries>${project.build.directory}/classes</sonar.java.binaries>
     </properties>
 
     <dependencies>

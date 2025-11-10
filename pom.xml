@@ -116,7 +116,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- Plugin JaCoCo para generar reporte XML -->
+            <!-- Plugin JaCoCo para generar el reporte XML y HTML -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -134,6 +134,15 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+                            <reports>
+                                <xml enabled="true"
+                                     destFile="${project.reporting.outputDirectory}/jacoco/jacoco.xml"/>
+                                <html enabled="true"/>
+                            </reports>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

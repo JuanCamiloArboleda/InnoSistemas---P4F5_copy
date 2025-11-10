@@ -1,14 +1,13 @@
-package com.innosistemas.service;
+package com.innosistemas.controller;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-class UsuarioServiceTest {
+class UsuarioControllerTest {
     @Test
-    void testMetodoEjemplo() {
+    void testControllerInstance() {
         com.innosistemas.repository.UsuarioRepository mockRepo = org.mockito.Mockito.mock(com.innosistemas.repository.UsuarioRepository.class);
-        UsuarioService service = new UsuarioService(mockRepo);
-        assertNotNull(service);
+        UsuarioController controller = new UsuarioController(mockRepo);
+        assertNotNull(controller);
     }
-    // Puedes agregar más pruebas para métodos puros
 }

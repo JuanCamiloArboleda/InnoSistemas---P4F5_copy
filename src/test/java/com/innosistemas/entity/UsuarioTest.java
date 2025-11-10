@@ -7,12 +7,16 @@ class UsuarioTest {
     @Test
     void testConstructorAndGetters() {
         Usuario usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setNombre("Juan");
-        usuario.setActivo(true);
-        assertEquals(1L, usuario.getId());
-        assertEquals("Juan", usuario.getNombre());
-        assertTrue(usuario.isActivo());
+        usuario.setId(1);
+        usuario.setNombres("Juan");
+        usuario.setApellidos("Pérez");
+        usuario.setContrasenia("1234");
+        usuario.setRol("ADMIN");
+        assertEquals(1, usuario.getId());
+        assertEquals("Juan", usuario.getNombres());
+        assertEquals("Pérez", usuario.getApellidos());
+        assertEquals("1234", usuario.getContrasenia());
+        assertEquals("ADMIN", usuario.getRol());
     }
     // Puedes agregar más pruebas para equals, hashCode, etc.
 }

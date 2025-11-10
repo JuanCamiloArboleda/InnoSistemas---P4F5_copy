@@ -2,8 +2,9 @@ name: Build and Deploy to EC2
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main, feature/deployment, dbfixes]
+  # Deshabilitado push automático para evitar errores de AWS
+  # push:
+  #   branches: [main, feature/deployment, dbfixes]
 
 permissions:
   id-token: write
@@ -37,62 +38,63 @@ jobs:
             -Dsonar.projectKey=JuanCamiloArboleda_InnoSistemas---P4F5_copy
             -Dsonar.organization=juancamiloarboleda
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.java.binaries=target
+            -Dsonar.java.binaries=target/classes
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
-  deploy:
-    needs: test-and-sonar
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag, and push image to ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: codefactory20252/backend
-          IMAGE_TAG: latest
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG 
-
-      - name: Add SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          aws s3 cp s3://${{ secrets.BUCKET_NAME }}/${{ secrets.KEYFILE_NAME }} ~/.ssh/ec2_key.pem
-          chmod 600 ~/.ssh/ec2_key.pem
-
-      - name: Deploy on EC2
-        env:
-          IMAGE_NAME: codefactory20252/backend
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DOCUMENT_HOST: ${{ secrets.DOCUMENT_HOST }}
-          DOCUMENT_USER: ${{ secrets.DOCUMENT_USER }}
-          DOCUMENT_PASS: ${{ secrets.DOCUMENT_PASS }}
-          DOCUMENT_DB: ${{ secrets.DOCUMENT_DB }}
-        run: |
-          ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 944401492013.dkr.ecr.us-east-1.amazonaws.com"
-          ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "docker pull $ECR_REGISTRY/$IMAGE_NAME:latest"
-          ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "docker stop backend_service || true"
-          ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "docker rm backend_service || true"
-          ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "docker run -d --restart=unless-stopped -p 80:8080 --name backend_service \
-          -e SPRING_DATASOURCE_URL=\"$DB_HOST\" \
-          -e SPRING_DATASOURCE_USERNAME=\"$DB_USER\" \
-          -e SPRING_DATASOURCE_PASSWORD=\"$DB_PASSWORD\" \
-          -e SPRING_DATA_MONGODB_URI=\"mongodb://${DOCUMENT_USER}:${DOCUMENT_PASS}@${DOCUMENT_HOST}:27017/${DOCUMENT_DB}?tls=true&tlsCAFile=global-bundle.pem&retryWrites=false\" \
-          ${{ steps.login-ecr.outputs.registry }}/$IMAGE_NAME:latest"
+  # Job de deploy deshabilitado temporalmente (requiere credenciales AWS)
+  # deploy:
+  #   needs: test-and-sonar
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: us-east-1
+  #
+  #     - name: Login to Amazon ECR
+  #       id: login-ecr
+  #       uses: aws-actions/amazon-ecr-login@v2
+  #
+  #     - name: Build, tag, and push image to ECR
+  #       env:
+  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+  #         ECR_REPOSITORY: codefactory20252/backend
+  #         IMAGE_TAG: latest
+  #       run: |
+  #         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+  #         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG 
+  #
+  #     - name: Add SSH Key
+  #       run: |
+  #         mkdir -p ~/.ssh
+  #         aws s3 cp s3://${{ secrets.BUCKET_NAME }}/${{ secrets.KEYFILE_NAME }} ~/.ssh/ec2_key.pem
+  #         chmod 600 ~/.ssh/ec2_key.pem
+  #
+  #     - name: Deploy on EC2
+  #       env:
+  #         IMAGE_NAME: codefactory20252/backend
+  #         DB_HOST: ${{ secrets.DB_HOST }}
+  #         DB_USER: ${{ secrets.DB_USER }}
+  #         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+  #         DOCUMENT_HOST: ${{ secrets.DOCUMENT_HOST }}
+  #         DOCUMENT_USER: ${{ secrets.DOCUMENT_USER }}
+  #         DOCUMENT_PASS: ${{ secrets.DOCUMENT_PASS }}
+  #         DOCUMENT_DB: ${{ secrets.DOCUMENT_DB }}
+  #       run: |
+  #         ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 944401492013.dkr.ecr.us-east-1.amazonaws.com"
+  #         ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "docker pull $ECR_REGISTRY/$IMAGE_NAME:latest"
+  #         ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "docker stop backend_service || true"
+  #         ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "docker rm backend_service || true"
+  #         ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "docker run -d --restart=unless-stopped -p 80:8080 --name backend_service \
+  #         -e SPRING_DATASOURCE_URL=\"$DB_HOST\" \
+  #         -e SPRING_DATASOURCE_USERNAME=\"$DB_USER\" \
+  #         -e SPRING_DATASOURCE_PASSWORD=\"$DB_PASSWORD\" \
+  #         -e SPRING_DATA_MONGODB_URI=\"mongodb://${DOCUMENT_USER}:${DOCUMENT_PASS}@${DOCUMENT_HOST}:27017/${DOCUMENT_DB}?tls=true&tlsCAFile=global-bundle.pem&retryWrites=false\" \
+  #         ${{ steps.login-ecr.outputs.registry }}/$IMAGE_NAME:latest"
           

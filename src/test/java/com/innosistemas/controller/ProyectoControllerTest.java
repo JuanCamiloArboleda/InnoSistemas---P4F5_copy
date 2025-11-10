@@ -25,14 +25,22 @@ class ProyectoControllerTest {
 
     @Test
     void testCreateProyecto() {
-        Proyecto proyecto = new Proyecto();
-        proyecto.setNombre("Proyecto Test");
-        proyecto.setDescripcion("Descripción Test");
-        proyecto.setEquipoId(1);
-        when(proyectoService.saveProyecto(any(Proyecto.class))).thenReturn(proyecto);
-        ResponseEntity<Proyecto> response = proyectoController.createProyecto("Proyecto Test", "Descripción Test", 1);
+        String nombre = "Proyecto Test";
+        String descripcion = "Descripción de prueba";
+        Integer equipoId = 42;
+        Proyecto proyectoMock = new Proyecto();
+        proyectoMock.setId(1);
+        proyectoMock.setNombre(nombre);
+        proyectoMock.setDescripcion(descripcion);
+        proyectoMock.setEquipoId(equipoId);
+        when(proyectoService.saveProyecto(any(Proyecto.class))).thenReturn(proyectoMock);
+
+        ResponseEntity<Proyecto> response = proyectoController.createProyecto(nombre, descripcion, equipoId);
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Proyecto Test", response.getBody().getNombre());
+        assertEquals(1, response.getBody().getId());
+        assertEquals(nombre, response.getBody().getNombre());
+        assertEquals(descripcion, response.getBody().getDescripcion());
+        assertEquals(equipoId, response.getBody().getEquipoId());
+        verify(proyectoService, times(1)).saveProyecto(any(Proyecto.class));
     }
 }

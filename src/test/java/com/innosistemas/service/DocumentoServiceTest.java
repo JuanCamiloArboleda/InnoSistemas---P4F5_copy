@@ -128,4 +128,37 @@ class DocumentoServiceTest {
             documentoService.updateDocumento(99, file, "nuevoTitulo", 2, "cambios");
         });
     }
+    @Test
+    void testUploadAndSaveDocumentoThrowsIOException() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getInputStream()).thenThrow(new IOException("Error de IO"));
+        assertThrows(IOException.class, () -> {
+            documentoService.uploadAndSaveDocumento(file, "titulo", 1, 1);
+        });
+    }
+
+    @Test
+    void testUpdateDocumentoErrorEnVersion() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        InputStream inputStream = mock(InputStream.class);
+        when(file.getInputStream()).thenReturn(inputStream);
+        when(file.getContentType()).thenReturn("application/pdf");
+        when(file.getOriginalFilename()).thenReturn("doc.pdf");
+        ObjectId fileId = new ObjectId();
+        when(gridFsTemplate.store(any(InputStream.class), anyString(), anyString(), any(DBObject.class))).thenReturn(fileId);
+        Documento documento = new Documento();
+        documento.setId(1);
+        documento.setTitulo("titulo");
+        when(documentoRepository.findById(1)).thenReturn(Optional.of(documento));
+        when(versionDocumentoRepository.save(any(VersionDocumento.class))).thenThrow(new RuntimeException("Error en versionDocumento"));
+        assertThrows(RuntimeException.class, () -> {
+            documentoService.updateDocumento(1, file, "nuevoTitulo", 2, "cambios");
+        });
+    }
+
+    @Test
+    void testSaveDocumentoValoresNulos() {
+        Documento doc = documentoService.saveDocumento(null, null, null, null);
+        assertNull(doc);
+    }
 }

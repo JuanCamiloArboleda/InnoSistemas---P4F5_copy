@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,8 +19,7 @@ import static org.mockito.Mockito.*;
 class EquipoControllerTest {
     @Mock
     private EquipoService equipoService;
-    @Mock
-    private Authentication authentication;
+
     @InjectMocks
     private EquipoController equipoController;
 
@@ -30,26 +29,26 @@ class EquipoControllerTest {
     }
 
     @Test
-    void testCreateEquipoSinUsuarios() {
+    void testCreateEquipoIncluyeUsuarioActual() {
+        String nombre = "Equipo Alpha";
+        String descripcion = "Equipo de pruebas";
+        List<String> correosUsuarios = Arrays.asList("user1@test.com", "user2@test.com");
+        Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("admin@test.com");
-        Equipo equipo = new Equipo();
-        equipo.setNombre("Equipo Test");
-        when(equipoService.createEquipoConUsuarios(anyString(), anyString(), anyList())).thenReturn(equipo);
-        ResponseEntity<Equipo> response = equipoController.createEquipo("Equipo Test", "Descripción", Collections.emptyList(), authentication);
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        verify(equipoService, times(1)).createEquipoConUsuarios(anyString(), anyString(), anyList());
-    }
 
-    @Test
-    void testCreateEquipoConUsuarios() {
-        when(authentication.getName()).thenReturn("admin@test.com");
-        Equipo equipo = new Equipo();
-        equipo.setNombre("Equipo Test");
-        when(equipoService.createEquipoConUsuarios(anyString(), anyString(), anyList())).thenReturn(equipo);
-        ResponseEntity<Equipo> response = equipoController.createEquipo("Equipo Test", "Descripción", Arrays.asList("user1@test.com", "user2@test.com"), authentication);
+        Equipo equipoMock = new Equipo();
+        equipoMock.setId(1);
+        equipoMock.setNombre(nombre);
+        equipoMock.setDescripcion(descripcion);
+        // El equipoService debe recibir la lista con el usuario actual incluido
+        List<String> expectedCorreos = Arrays.asList("user1@test.com", "user2@test.com", "admin@test.com");
+        when(equipoService.createEquipoConUsuarios(eq(nombre), eq(descripcion), eq(expectedCorreos))).thenReturn(equipoMock);
+
+        ResponseEntity<Equipo> response = equipoController.createEquipo(nombre, descripcion, correosUsuarios, authentication);
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Equipo Test", response.getBody().getNombre());
+        assertEquals(1, response.getBody().getId());
+        assertEquals(nombre, response.getBody().getNombre());
+        assertEquals(descripcion, response.getBody().getDescripcion());
+        verify(equipoService, times(1)).createEquipoConUsuarios(eq(nombre), eq(descripcion), eq(expectedCorreos));
     }
 }

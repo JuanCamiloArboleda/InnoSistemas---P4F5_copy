@@ -43,4 +43,11 @@ class ProyectoControllerTest {
         assertEquals(equipoId, response.getBody().getEquipoId());
         verify(proyectoService, times(1)).saveProyecto(any(Proyecto.class));
     }
+    @Test
+    void testCreateProyectoParametrosNulos() {
+        when(proyectoService.saveProyecto(any(Proyecto.class))).thenReturn(null);
+        ResponseEntity<Proyecto> response = proyectoController.createProyecto(null, null, null);
+        assertNull(response.getBody());
+        verify(proyectoService, times(1)).saveProyecto(any(Proyecto.class));
+    }
 }

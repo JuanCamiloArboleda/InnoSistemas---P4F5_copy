@@ -149,4 +149,13 @@ class UsuarioControllerTest {
         assertEquals("Profesor no encontrado", exception.getMessage());
         verify(usuarioRepository, times(1)).findByCorreo("noprofesor@test.com");
     }
+        @Test
+        void testGetEstudianteInfoUsuarioNoExiste() {
+                Principal principal = mock(Principal.class);
+                when(principal.getName()).thenReturn("noexiste@test.com");
+                when(usuarioRepository.findByCorreo("noexiste@test.com")).thenReturn(Optional.empty());
+                RuntimeException exception = assertThrows(RuntimeException.class, () -> usuarioController.getEstudianteInfo(principal));
+                assertEquals("Estudiante no encontrado", exception.getMessage());
+                verify(usuarioRepository, times(1)).findByCorreo("noexiste@test.com");
+        }
 }

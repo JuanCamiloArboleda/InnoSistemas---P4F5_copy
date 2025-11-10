@@ -1,6 +1,8 @@
 package com.innosistemas.service;
 
 import com.innosistemas.entity.Equipo;
+import com.innosistemas.entity.Usuario;
+import com.innosistemas.entity.UsuarioEquipo;
 import com.innosistemas.repository.EquipoRepository;
 import com.innosistemas.repository.UsuarioEquipoRepository;
 import com.innosistemas.repository.UsuarioRepository;
@@ -11,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,9 +34,38 @@ class EquipoServiceTest {
     }
 
     @Test
-    void testCreateEquipoConUsuarios() {
+    void testCreateEquipoConUsuariosSinUsuarios() {
         when(equipoRepository.save(any(Equipo.class))).thenReturn(new Equipo());
         Equipo equipo = equipoService.createEquipoConUsuarios("nombre", "desc", Collections.emptyList());
         assertNotNull(equipo);
+        verify(equipoRepository, times(1)).save(any(Equipo.class));
+        verify(usuarioEquipoRepository, never()).save(any(UsuarioEquipo.class));
+    }
+
+    @Test
+    void testCreateEquipoConUsuariosConUsuario() {
+        Equipo equipoMock = new Equipo();
+        equipoMock.setId(10);
+        when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoMock);
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setId(20);
+        when(usuarioRepository.findByCorreo("correo@ejemplo.com")).thenReturn(Optional.of(usuarioMock));
+        when(usuarioEquipoRepository.save(any(UsuarioEquipo.class))).thenReturn(new UsuarioEquipo());
+        Equipo equipo = equipoService.createEquipoConUsuarios("nombre", "desc", Collections.singletonList("correo@ejemplo.com"));
+        assertNotNull(equipo);
+        verify(usuarioRepository, times(1)).findByCorreo("correo@ejemplo.com");
+        verify(usuarioEquipoRepository, times(1)).save(any(UsuarioEquipo.class));
+    }
+
+    @Test
+    void testCreateEquipoConUsuariosUsuarioNoEncontrado() {
+        Equipo equipoMock = new Equipo();
+        equipoMock.setId(10);
+        when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoMock);
+        when(usuarioRepository.findByCorreo("noexiste@ejemplo.com")).thenReturn(Optional.empty());
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> {
+            equipoService.createEquipoConUsuarios("nombre", "desc", Collections.singletonList("noexiste@ejemplo.com"));
+        });
+        assertTrue(ex.getMessage().contains("Usuario no encontrado"));
     }
 }

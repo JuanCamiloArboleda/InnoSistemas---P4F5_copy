@@ -6,7 +6,13 @@ class FabricaInnosistemasF5ApplicationTests {
 
     @Test
     void testBasico() {
-        // Test de ejemplo sin Spring Boot
-        assert true;
+        int resultado = 2 + 2;
+        assert resultado == 4;
+    }
+
+    @Test
+    void testCondicional() {
+        boolean activo = true;
+        assert activo;
     }
 }

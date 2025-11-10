@@ -38,5 +38,5 @@ jobs:
             -Dsonar.projectKey=JuanCamiloArboleda_InnoSistemas---P4F5_copy
             -Dsonar.organization=juancamiloarboleda
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.java.binaries=target
+            -Dsonar.java.binaries=target/classes
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml

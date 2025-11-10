@@ -28,32 +28,11 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build and Test with JaCoCo
+      - name: Build and Test with Coverage
         run: mvn -B clean verify
-
-      - name: Verify JaCoCo Report and Classes
-        run: |
-          echo "Checking if JaCoCo report exists..."
-          ls -la target/site/jacoco/
-          if [ -f target/site/jacoco/jacoco.xml ]; then
-            echo "✓ JaCoCo XML report found"
-            head -n 5 target/site/jacoco/jacoco.xml
-          else
-            echo "✗ JaCoCo XML report NOT found"
-            exit 1
-          fi
-          echo ""
-          echo "Checking if compiled classes exist..."
-          if [ -d target/classes ]; then
-            echo "✓ target/classes directory found"
-            ls -la target/classes/com/innosistemas/ | head -n 10
-          else
-            echo "✗ target/classes directory NOT found"
-            exit 1
-          fi
 
       - name: SonarCloud Scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B sonar:sonar -X -Dsonar.verbose=true
+        run: mvn -B sonar:sonar

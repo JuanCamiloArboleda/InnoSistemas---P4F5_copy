@@ -114,12 +114,6 @@
     <build>
         <plugins>
 
-            <!-- Plugin principal de Spring Boot -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-
             <!-- Plugin JaCoCo para generar el reporte XML y HTML -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -146,6 +140,12 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Plugin principal de Spring Boot -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
             <!-- Plugin Sonar para ejecución manual/local o por CI -->

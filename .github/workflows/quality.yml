@@ -32,10 +32,11 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2.2.0
         env:
-          SONAR_TOKEN: c3634482f0ae8074eb7b30641c9b7e46945b1179
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=InnoSistemas-F5
-            -Dsonar.organization=innosistemas
+            -Dsonar.projectKey=JuanCamiloArboleda_InnoSistemas---P4F5_copy
+            -Dsonar.organization=juancamiloarboleda
+            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.java.binaries=target
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml

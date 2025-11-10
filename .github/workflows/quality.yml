@@ -31,6 +31,18 @@ jobs:
       - name: Build and Test with JaCoCo
         run: mvn -B clean verify
 
+      - name: Verify JaCoCo Report
+        run: |
+          echo "Checking if JaCoCo report exists..."
+          ls -la target/site/jacoco/
+          if [ -f target/site/jacoco/jacoco.xml ]; then
+            echo "✓ JaCoCo XML report found"
+            head -n 5 target/site/jacoco/jacoco.xml
+          else
+            echo "✗ JaCoCo XML report NOT found"
+            exit 1
+          fi
+
       - name: SonarCloud Scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

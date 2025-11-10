@@ -25,6 +25,11 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <!-- Ruta del reporte JaCoCo para SonarCloud -->
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <!-- Directorios de código fuente y binarios -->
+        <sonar.sources>src/main/java</sonar.sources>
+        <sonar.java.binaries>target/classes</sonar.java.binaries>
+        <sonar.tests>src/test/java</sonar.tests>
+        <sonar.java.test.binaries>target/test-classes</sonar.java.test.binaries>
     </properties>
 
     <dependencies>

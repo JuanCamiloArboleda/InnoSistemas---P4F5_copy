@@ -35,13 +35,13 @@ class EquipoServiceTest {
 
     @Test
     void testCreateEquipoConUsuariosSinUsuarios() {
-        // Arrange:
+        // Arrange
         when(equipoRepository.save(any(Equipo.class))).thenReturn(new Equipo());
 
-        // Act:
+        // Act
         Equipo equipo = equipoService.createEquipoConUsuarios("nombre", "desc", Collections.emptyList());
 
-        // Assert:
+        // Assert
         assertNotNull(equipo);
         verify(equipoRepository, times(1)).save(any(Equipo.class));
         verify(usuarioEquipoRepository, never()).save(any(UsuarioEquipo.class));
@@ -49,19 +49,27 @@ class EquipoServiceTest {
 
     @Test
     void testCreateEquipoConUsuariosConUsuario() {
-        // Arrange:
+        // Arrange
         Equipo equipoMock = new Equipo();
         equipoMock.setId(10);
         when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoMock);
+
         Usuario usuarioMock = new Usuario();
         usuarioMock.setId(20);
-        when(usuarioRepository.findByCorreo("correo@ejemplo.com")).thenReturn(Optional.of(usuarioMock));
-        when(usuarioEquipoRepository.save(any(UsuarioEquipo.class))).thenReturn(new UsuarioEquipo());
+        when(usuarioRepository.findByCorreo("correo@ejemplo.com"))
+                .thenReturn(Optional.of(usuarioMock));
 
-        // Act:
-        Equipo equipo = equipoService.createEquipoConUsuarios("nombre", "desc", Collections.singletonList("correo@ejemplo.com"));
+        when(usuarioEquipoRepository.save(any(UsuarioEquipo.class)))
+                .thenReturn(new UsuarioEquipo());
 
-        // Assert:
+        // Act
+        Equipo equipo = equipoService.createEquipoConUsuarios(
+                "nombre",
+                "desc",
+                Collections.singletonList("correo@ejemplo.com")
+        );
+
+        // Assert
         assertNotNull(equipo);
         verify(usuarioRepository, times(1)).findByCorreo("correo@ejemplo.com");
         verify(usuarioEquipoRepository, times(1)).save(any(UsuarioEquipo.class));
@@ -69,17 +77,21 @@ class EquipoServiceTest {
 
     @Test
     void testCreateEquipoConUsuariosUsuarioNoEncontrado() {
-        // Arrange:
+        // Arrange
         Equipo equipoMock = new Equipo();
         equipoMock.setId(10);
         when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoMock);
-        when(usuarioRepository.findByCorreo("noexiste@ejemplo.com")).thenReturn(Optional.empty());
+        when(usuarioRepository.findByCorreo("noexiste@ejemplo.com"))
+                .thenReturn(Optional.empty());
 
-        // Act & Assert:
+        // Act & Assert
         RuntimeException ex = assertThrows(RuntimeException.class, () -> {
-            equipoService.createEquipoConUsuarios("nombre", "desc", Collections.singletonList("noexiste@ejemplo.com"));
+            equipoService.createEquipoConUsuarios(
+                    "nombre",
+                    "desc",
+                    Collections.singletonList("noexiste@ejemplo.com")
+            );
         });
         assertTrue(ex.getMessage().contains("Usuario no encontrado"));
     }
-    }
-}
+} // ✅ Cierre de la clase añadido correctamente

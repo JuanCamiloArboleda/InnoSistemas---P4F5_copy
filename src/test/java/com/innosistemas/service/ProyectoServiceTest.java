@@ -24,9 +24,14 @@ class ProyectoServiceTest {
 
     @Test
     void testSaveProyecto() {
+        // Arrange:
         Proyecto p = new Proyecto();
         when(proyectoRepository.save(p)).thenReturn(p);
+
+        // Act:
         Proyecto result = proyectoService.saveProyecto(p);
+
+        // Assert:
         assertEquals(p, result);
     }
 }

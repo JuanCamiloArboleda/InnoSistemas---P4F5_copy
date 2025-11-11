@@ -27,10 +27,15 @@ class VersionDocumentoServiceTest {
 
     @Test
     void testObtenerVersionesDocumento() {
+        // Arrange:
         VersionDocumento v1 = new VersionDocumento();
         VersionDocumento v2 = new VersionDocumento();
         when(versionDocumentoRepository.findByDocumentoIdOrderByFechaVersionDesc(1)).thenReturn(Arrays.asList(v1, v2));
+
+        // Act:
         List<VersionDocumento> versiones = versionDocumentoService.obtenerVersionesDocumento(1);
+
+        // Assert:
         assertEquals(2, versiones.size());
     }
 }

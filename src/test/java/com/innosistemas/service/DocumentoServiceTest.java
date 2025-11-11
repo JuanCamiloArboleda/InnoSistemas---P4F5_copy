@@ -42,32 +42,48 @@ class DocumentoServiceTest {
 
     @Test
     void testSaveDocumento() {
+        // Arrange:
         when(documentoRepository.save(any(Documento.class))).thenReturn(new Documento());
+
+        // Act:
         Documento doc = documentoService.saveDocumento("gridfsid", "titulo", 1, 1);
+
+        // Assert:
         assertNotNull(doc);
     }
 
     @Test
     void testFindAllDocumentosByProyectoId() {
+        // Arrange:
         Documento d1 = new Documento();
         Documento d2 = new Documento();
         when(documentoRepository.findByProyectoId(1)).thenReturn(Arrays.asList(d1, d2));
+
+        // Act:
         List<Documento> docs = documentoService.findAllDocumentosByProyectoId(1);
+
+        // Assert:
         assertEquals(2, docs.size());
     }
 
     @Test
     void testDownloadByGridFsId() throws IOException {
-    GridFsResource resource = mock(GridFsResource.class);
-    com.mongodb.client.gridfs.model.GridFSFile gridFSFile = mock(com.mongodb.client.gridfs.model.GridFSFile.class);
-    when(gridFsTemplate.findOne(any(Query.class))).thenReturn(gridFSFile);
-    when(gridFsTemplate.getResource(gridFSFile)).thenReturn(resource);
-    GridFsResource result = documentoService.downloadByGridFsId(new ObjectId().toHexString());
-    assertNotNull(result);
+        // Arrange:
+        GridFsResource resource = mock(GridFsResource.class);
+        com.mongodb.client.gridfs.model.GridFSFile gridFSFile = mock(com.mongodb.client.gridfs.model.GridFSFile.class);
+        when(gridFsTemplate.findOne(any(Query.class))).thenReturn(gridFSFile);
+        when(gridFsTemplate.getResource(gridFSFile)).thenReturn(resource);
+
+        // Act:
+        GridFsResource result = documentoService.downloadByGridFsId(new ObjectId().toHexString());
+
+        // Assert:
+        assertNotNull(result);
     }
 
     @Test
     void testUploadAndSaveDocumentoSuccess() throws IOException {
+        // Arrange:
         MultipartFile file = mock(MultipartFile.class);
         InputStream inputStream = mock(InputStream.class);
         when(file.getInputStream()).thenReturn(inputStream);
@@ -76,12 +92,17 @@ class DocumentoServiceTest {
         ObjectId fileId = new ObjectId();
         when(gridFsTemplate.store(any(InputStream.class), anyString(), anyString(), any(DBObject.class))).thenReturn(fileId);
         when(documentoRepository.save(any(Documento.class))).thenReturn(new Documento());
+
+        // Act:
         Documento doc = documentoService.uploadAndSaveDocumento(file, "titulo", 1, 1);
+
+        // Assert:
         assertNotNull(doc);
     }
 
     @Test
     void testUploadAndSaveDocumentoErrorEnSave() throws IOException {
+        // Arrange:
         MultipartFile file = mock(MultipartFile.class);
         InputStream inputStream = mock(InputStream.class);
         when(file.getInputStream()).thenReturn(inputStream);
@@ -90,17 +111,19 @@ class DocumentoServiceTest {
         ObjectId fileId = new ObjectId();
         when(gridFsTemplate.store(any(InputStream.class), anyString(), anyString(), any(DBObject.class))).thenReturn(fileId);
         when(documentoRepository.save(any(Documento.class))).thenThrow(new RuntimeException("Error en saveDocumento"));
-        
+
+        // Act & Assert:
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             documentoService.uploadAndSaveDocumento(file, "titulo", 1, 1);
         });
         assertEquals("Error en saveDocumento", exception.getMessage());
-        // Verificamos que se intentó hacer cleanup (delete puede fallar silenciosamente en el catch interno)
+        // Assert extra:
         verify(gridFsTemplate, atLeastOnce()).store(any(InputStream.class), anyString(), anyString(), any(DBObject.class));
     }
 
     @Test
     void testUpdateDocumentoSuccess() throws IOException {
+        // Arrange:
         MultipartFile file = mock(MultipartFile.class);
         InputStream inputStream = mock(InputStream.class);
         when(file.getInputStream()).thenReturn(inputStream);
@@ -114,23 +137,33 @@ class DocumentoServiceTest {
         when(documentoRepository.findById(1)).thenReturn(Optional.of(documento));
         when(documentoRepository.save(any(Documento.class))).thenReturn(documento);
         when(versionDocumentoRepository.save(any(VersionDocumento.class))).thenReturn(new VersionDocumento());
+
+        // Act:
         Documento result = documentoService.updateDocumento(1, file, "nuevoTitulo", 2, "cambios");
+
+        // Assert:
         assertNotNull(result);
         verify(versionDocumentoRepository, times(1)).save(any(VersionDocumento.class));
     }
 
     @Test
     void testUpdateDocumentoNotFound() throws IOException {
+        // Arrange:
         MultipartFile file = mock(MultipartFile.class);
         when(documentoRepository.findById(99)).thenReturn(Optional.empty());
+
+        // Act & Assert:
         assertThrows(RuntimeException.class, () -> {
             documentoService.updateDocumento(99, file, "nuevoTitulo", 2, "cambios");
         });
     }
     @Test
     void testUploadAndSaveDocumentoThrowsIOException() throws IOException {
+        // Arrange:
         MultipartFile file = mock(MultipartFile.class);
         when(file.getInputStream()).thenThrow(new IOException("Error de IO"));
+
+        // Act & Assert:
         assertThrows(IOException.class, () -> {
             documentoService.uploadAndSaveDocumento(file, "titulo", 1, 1);
         });
@@ -138,6 +171,7 @@ class DocumentoServiceTest {
 
     @Test
     void testUpdateDocumentoErrorEnVersion() throws IOException {
+        // Arrange:
         MultipartFile file = mock(MultipartFile.class);
         InputStream inputStream = mock(InputStream.class);
         when(file.getInputStream()).thenReturn(inputStream);
@@ -150,6 +184,8 @@ class DocumentoServiceTest {
         documento.setTitulo("titulo");
         when(documentoRepository.findById(1)).thenReturn(Optional.of(documento));
         when(versionDocumentoRepository.save(any(VersionDocumento.class))).thenThrow(new RuntimeException("Error en versionDocumento"));
+
+        // Act & Assert:
         assertThrows(RuntimeException.class, () -> {
             documentoService.updateDocumento(1, file, "nuevoTitulo", 2, "cambios");
         });
@@ -157,7 +193,13 @@ class DocumentoServiceTest {
 
     @Test
     void testSaveDocumentoValoresNulos() {
+        // Arrange:
+        // No se requiere preparación
+
+        // Act:
         Documento doc = documentoService.saveDocumento(null, null, null, null);
+
+        // Assert:
         assertNull(doc);
     }
 }

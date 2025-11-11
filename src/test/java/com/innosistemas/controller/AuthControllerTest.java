@@ -13,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -37,6 +36,7 @@ class AuthControllerTest {
 
     @Test
     void testAuthenticateUserSuccess() {
+        // Arrange:
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setCorreo("user@test.com");
         loginRequest.setPassword("password");
@@ -49,7 +49,10 @@ class AuthControllerTest {
         usuario.setRol("ADMIN");
         when(usuarioRepository.findByCorreo("user@test.com")).thenReturn(java.util.Optional.of(usuario));
 
+        // Act:
         JwtResponse response = authController.authenticateUser(loginRequest);
+
+        // Assert:
         assertEquals("jwt-token", response.getToken());
         assertEquals("user@test.com", response.getCorreo());
         assertEquals("Juan", response.getNombres());
@@ -59,6 +62,7 @@ class AuthControllerTest {
 
     @Test
     void testAuthenticateUserUsuarioNoExiste() {
+        // Arrange:
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setCorreo("noexiste@test.com");
         loginRequest.setPassword("password");
@@ -67,7 +71,10 @@ class AuthControllerTest {
         when(jwtUtils.generateJwtToken(authentication)).thenReturn("jwt-token");
         when(usuarioRepository.findByCorreo("noexiste@test.com")).thenReturn(java.util.Optional.empty());
 
+        // Act:
         JwtResponse response = authController.authenticateUser(loginRequest);
+
+        // Assert:
         assertEquals("jwt-token", response.getToken());
         assertEquals("noexiste@test.com", response.getCorreo());
         assertEquals("", response.getNombres());
@@ -77,17 +84,28 @@ class AuthControllerTest {
 
     @Test
     void testLogoutCurrentUser() {
+        // Arrange:
         when(authentication.getName()).thenReturn("user@test.com");
         Usuario usuario = new Usuario();
         usuario.setCorreo("user@test.com");
         when(usuarioRepository.findByCorreo("user@test.com")).thenReturn(java.util.Optional.of(usuario));
-    authController.logoutCurrentUser(authentication);
-    verify(usuarioRepository, times(1)).save(usuario);
+
+        // Act:
+        authController.logoutCurrentUser(authentication);
+
+        // Assert:
+        verify(usuarioRepository, times(1)).save(usuario);
     }
 
     @Test
     void testLogoutCurrentUserNullAuthentication() {
+        // Arrange:
+        // No se requiere preparación
+
+        // Act:
         authController.logoutCurrentUser(null);
+
+        // Assert:
         verify(usuarioRepository, never()).save(any());
     }
 }

@@ -1,5 +1,4 @@
 package com.innosistemas.FabricaInnosistemasF5;
-import com.innosistemas.entity.Usuario;
 import com.innosistemas.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -7,18 +6,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 
 /* Aquí se prueba la conexion con la base de datos ingresando un usuario*/
 @Component
 public class DataLoader implements CommandLineRunner {
     @Autowired
+    @SuppressWarnings("unused")
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    @SuppressWarnings("unused")
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    @SuppressWarnings("unused")
     private DataSource dataSource;
 
     @Override

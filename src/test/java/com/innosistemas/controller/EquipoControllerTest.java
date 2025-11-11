@@ -30,21 +30,23 @@ class EquipoControllerTest {
 
     @Test
     void testCreateEquipoIncluyeUsuarioActual() {
+        // Arrange:
         String nombre = "Equipo Alpha";
         String descripcion = "Equipo de pruebas";
         List<String> correosUsuarios = Arrays.asList("user1@test.com", "user2@test.com");
         Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("admin@test.com");
-
         Equipo equipoMock = new Equipo();
         equipoMock.setId(1);
         equipoMock.setNombre(nombre);
         equipoMock.setDescripcion(descripcion);
-        // El equipoService debe recibir la lista con el usuario actual incluido
         List<String> expectedCorreos = Arrays.asList("user1@test.com", "user2@test.com", "admin@test.com");
         when(equipoService.createEquipoConUsuarios(eq(nombre), eq(descripcion), eq(expectedCorreos))).thenReturn(equipoMock);
 
+        // Act:
         ResponseEntity<Equipo> response = equipoController.createEquipo(nombre, descripcion, correosUsuarios, authentication);
+
+        // Assert:
         assertNotNull(response);
         assertEquals(1, response.getBody().getId());
         assertEquals(nombre, response.getBody().getNombre());
@@ -54,13 +56,12 @@ class EquipoControllerTest {
     
         @Test
         void testCreateEquipoUsuarioNoAutorizado() {
+            // Arrange:
             String nombre = "Equipo Beta";
             String descripcion = "Equipo sin permisos";
             List<String> correosUsuarios = Arrays.asList("user1@test.com");
             Authentication authentication = mock(Authentication.class);
             when(authentication.getName()).thenReturn("noauth@test.com");
-
-            // Simula que el usuario no está en la lista y no se agrega
             Equipo equipoMock = new Equipo();
             equipoMock.setId(2);
             equipoMock.setNombre(nombre);
@@ -68,7 +69,10 @@ class EquipoControllerTest {
             List<String> expectedCorreos = Arrays.asList("user1@test.com", "noauth@test.com");
             when(equipoService.createEquipoConUsuarios(eq(nombre), eq(descripcion), eq(expectedCorreos))).thenReturn(equipoMock);
 
+            // Act:
             ResponseEntity<Equipo> response = equipoController.createEquipo(nombre, descripcion, correosUsuarios, authentication);
+
+            // Assert:
             assertNotNull(response);
             assertEquals(2, response.getBody().getId());
             assertEquals(nombre, response.getBody().getNombre());

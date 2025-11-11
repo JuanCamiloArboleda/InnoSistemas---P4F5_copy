@@ -25,6 +25,7 @@ class ProyectoControllerTest {
 
     @Test
     void testCreateProyecto() {
+        // Arrange:
         String nombre = "Proyecto Test";
         String descripcion = "Descripción de prueba";
         Integer equipoId = 42;
@@ -35,7 +36,10 @@ class ProyectoControllerTest {
         proyectoMock.setEquipoId(equipoId);
         when(proyectoService.saveProyecto(any(Proyecto.class))).thenReturn(proyectoMock);
 
+        // Act:
         ResponseEntity<Proyecto> response = proyectoController.createProyecto(nombre, descripcion, equipoId);
+
+        // Assert:
         assertNotNull(response);
         assertEquals(1, response.getBody().getId());
         assertEquals(nombre, response.getBody().getNombre());
@@ -45,8 +49,13 @@ class ProyectoControllerTest {
     }
     @Test
     void testCreateProyectoParametrosNulos() {
+        // Arrange:
         when(proyectoService.saveProyecto(any(Proyecto.class))).thenReturn(null);
+
+        // Act:
         ResponseEntity<Proyecto> response = proyectoController.createProyecto(null, null, null);
+
+        // Assert:
         assertNull(response.getBody());
         verify(proyectoService, times(1)).saveProyecto(any(Proyecto.class));
     }

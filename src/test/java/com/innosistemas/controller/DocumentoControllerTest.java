@@ -38,6 +38,7 @@ class DocumentoControllerTest {
 
     @Test
     void testUploadDocumentoUsuarioAutorizado() throws Exception {
+        // Arrange:
         MultipartFile file = mock(MultipartFile.class);
         String titulo = "DocTest";
         Integer proyectoId = 1;
@@ -53,7 +54,10 @@ class DocumentoControllerTest {
         docMock.setTitulo(titulo);
         when(documentoService.uploadAndSaveDocumento(file, titulo, proyectoId, 10)).thenReturn(docMock);
 
+        // Act:
         ResponseEntity<?> response = documentoController.uploadDocumento(file, titulo, proyectoId, authentication);
+
+        // Assert:
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertTrue(response.getBody() instanceof Documento);
         assertEquals(5, ((Documento) response.getBody()).getId());
@@ -62,6 +66,7 @@ class DocumentoControllerTest {
 
     @Test
     void testUploadDocumentoUsuarioNoAutorizado() throws Exception {
+        // Arrange:
         MultipartFile file = mock(MultipartFile.class);
         String titulo = "DocTest";
         Integer proyectoId = 1;
@@ -73,7 +78,10 @@ class DocumentoControllerTest {
         when(usuarioRepository.findByCorreo("user@test.com")).thenReturn(java.util.Optional.of(usuario));
         when(authorizationService.tieneAccesoAProyecto(10, proyectoId)).thenReturn(false);
 
+        // Act:
         ResponseEntity<?> response = documentoController.uploadDocumento(file, titulo, proyectoId, authentication);
+
+        // Assert:
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         assertEquals("No tienes permiso para subir documentos a este proyecto.", response.getBody());
         verify(documentoService, never()).uploadAndSaveDocumento(any(), any(), any(), any());

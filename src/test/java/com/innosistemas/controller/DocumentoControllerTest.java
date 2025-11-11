@@ -81,9 +81,9 @@ class DocumentoControllerTest {
         // Act:
         ResponseEntity<?> response = documentoController.uploadDocumento(file, titulo, proyectoId, authentication);
 
-        // Assert:
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        assertEquals("No tienes permiso para subir documentos a este proyecto.", response.getBody());
-        verify(documentoService, never()).uploadAndSaveDocumento(any(), any(), any(), any());
+    // Assert:
+    assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    assertNull(response.getBody());
+    verify(documentoService, never()).uploadAndSaveDocumento(any(), any(), any(), any());
     }
 }

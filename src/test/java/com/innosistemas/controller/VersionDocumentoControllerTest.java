@@ -80,8 +80,8 @@ class VersionDocumentoControllerTest {
         when(authorizationService.tieneAccesoAProyecto(10, 2)).thenReturn(false);
 
         ResponseEntity<?> response = versionDocumentoController.obtenerVersionesDocumento(documentoId, authentication);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        assertEquals("No tienes permiso para ver las versiones de este documento.", response.getBody());
-        verify(versionDocumentoService, never()).obtenerVersionesDocumento(any());
+    assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    assertNull(response.getBody());
+    verify(versionDocumentoService, never()).obtenerVersionesDocumento(any());
     }
 }

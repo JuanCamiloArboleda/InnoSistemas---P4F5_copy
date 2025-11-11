@@ -171,13 +171,13 @@
                 </configuration>
             </plugin>
 
-            <!-- ☕ Spring Boot -->
+            <!--Spring Boot -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- 🔍 SonarCloud -->
+            <!-- SonarCloud -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>

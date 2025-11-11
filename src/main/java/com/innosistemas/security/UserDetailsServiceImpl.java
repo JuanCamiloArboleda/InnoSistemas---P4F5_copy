@@ -1,7 +1,6 @@
 package com.innosistemas.security;
 import com.innosistemas.repository.UsuarioRepository;
 import com.innosistemas.entity.Usuario;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
@@ -17,8 +16,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         /**
          * Repositorio para acceder a los datos de los usuarios.
          */
-        @Autowired
-        private UsuarioRepository usuarioRepository;
+                private final UsuarioRepository usuarioRepository;
+
+                public UserDetailsServiceImpl(UsuarioRepository usuarioRepository) {
+                        this.usuarioRepository = usuarioRepository;
+                }
 
     /**
      * Carga los detalles de un usuario por su correo electrónico.

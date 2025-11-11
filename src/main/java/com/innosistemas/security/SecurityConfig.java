@@ -1,7 +1,6 @@
 package com.innosistemas.security;
 
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,8 +26,7 @@ public class SecurityConfig {
 	/**
 	 * Filtro para validar el JWT en cada petición.
 	 */
-	@Autowired
-	private JwtAuthFilter jwtAuthFilter;
+	private static final String ROLE_ADMIN = "ADMIN";
 
 	/**
 	 * Configura la cadena de filtros de seguridad y las reglas de acceso.
@@ -37,28 +35,29 @@ public class SecurityConfig {
 	 * @return SecurityFilterChain configurada
 	 * @throws Exception
 	 */
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf(csrf -> csrf.disable())
-				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth
-						// Rutas públicas
-						.requestMatchers("/auth/**").permitAll()
-						.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-						// Ejemplo de rutas por rol (ajusta las rutas según tu aplicación):
-						// - Rutas administrativas
-						.requestMatchers("/admin/**").hasRole("ADMIN")
-						// - Rutas para profesores
-						.requestMatchers("/profesor/**").hasAnyRole("PROFESOR", "ADMIN")
-						// - Rutas para estudiantes
-						.requestMatchers("/estudiante/**").hasAnyRole("ESTUDIANTE", "PROFESOR", "ADMIN")
-						// El resto requiere autenticación
-						.anyRequest().authenticated())
-				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-		return http.build();
-	}
+	
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
+	http
+		.csrf(csrf -> csrf.disable())
+		.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+		.authorizeHttpRequests(auth -> auth
+			// Rutas públicas
+			.requestMatchers("/auth/**").permitAll()
+			.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+			// Ejemplo de rutas por rol (ajusta las rutas según tu aplicación):
+			// - Rutas administrativas
+			.requestMatchers("/admin/**").hasRole(ROLE_ADMIN)
+			// - Rutas para profesores
+			.requestMatchers("/profesor/**").hasAnyRole("PROFESOR", ROLE_ADMIN)
+			// - Rutas para estudiantes
+			.requestMatchers("/estudiante/**").hasAnyRole("ESTUDIANTE", "PROFESOR", ROLE_ADMIN)
+			// El resto requiere autenticación
+			.anyRequest().authenticated())
+		.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+	return http.build();
+    }
 
 	/**
 	 * Bean para obtener el AuthenticationManager de la configuración.

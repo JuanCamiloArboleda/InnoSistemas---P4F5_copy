@@ -4,7 +4,6 @@ import com.innosistemas.dto.JwtResponse;
 import com.innosistemas.dto.LoginRequest;
 import com.innosistemas.entity.Usuario;
 import com.innosistemas.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,14 +14,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UsuarioRepository usuarioRepository) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+        this.usuarioRepository = usuarioRepository;
+    }
 
     @PostMapping("/login")
     public JwtResponse authenticateUser(@RequestBody LoginRequest loginRequest) {

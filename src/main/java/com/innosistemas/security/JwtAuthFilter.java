@@ -8,7 +8,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,17 +24,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 	/**
 	 * Utilidad para operaciones con JWT (generar, validar, extraer usuario).
 	 */
-	@Autowired
-	private JwtUtils jwtUtils;
+	private final JwtUtils jwtUtils;
+	private final UserDetailsService userDetailsService;
+	private final UsuarioRepository usuarioRepository;
 
-	/**
-	 * Servicio para cargar los detalles del usuario desde la base de datos.
-	 */
-	@Autowired
-	private UserDetailsService userDetailsService;
-
-	@Autowired
-	private UsuarioRepository usuarioRepository;
+	public JwtAuthFilter(JwtUtils jwtUtils, UserDetailsService userDetailsService, UsuarioRepository usuarioRepository) {
+		this.jwtUtils = jwtUtils;
+		this.userDetailsService = userDetailsService;
+		this.usuarioRepository = usuarioRepository;
+	}
 
 	/**
 	 * Método principal del filtro. Extrae el token JWT del encabezado Authorization,

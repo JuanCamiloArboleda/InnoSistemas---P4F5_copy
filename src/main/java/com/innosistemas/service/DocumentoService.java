@@ -23,21 +23,23 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class DocumentoService {
+
     private final GridFsTemplate gridFsTemplate;
     private final DocumentoRepository documentoRepository;
     private final VersionDocumentoRepository versionDocumentoRepository;
 
-    public DocumentoService(GridFsTemplate gridFsTemplate, DocumentoRepository documentoRepository, VersionDocumentoRepository versionDocumentoRepository) {
+    public DocumentoService(GridFsTemplate gridFsTemplate,
+                            DocumentoRepository documentoRepository,
+                            VersionDocumentoRepository versionDocumentoRepository) {
         this.gridFsTemplate = gridFsTemplate;
         this.documentoRepository = documentoRepository;
         this.versionDocumentoRepository = versionDocumentoRepository;
     }
 
-    // Sube el archivo a GridFS y guarda el documento en postgresql
+    // Sube el archivo a GridFS y guarda el documento en PostgreSQL
     public Documento uploadAndSaveDocumento(MultipartFile file, String titulo, Integer proyectoId, Integer usuarioId)
             throws IOException {
         ObjectId fileId;
-        // Sube el archivo a GridFS
         try (InputStream inputStream = file.getInputStream()) {
             DBObject metadata = new BasicDBObject();
             metadata.put("contentType", file.getContentType());
@@ -55,11 +57,11 @@ public class DocumentoService {
             } catch (Exception cleanupEx) {
                 // log cleanupEx
             }
-            throw ex; // propaga error al caller (HTTP 5xx o manejado)
+            throw ex;
         }
     }
 
-    // Guarda el documento en postgresql
+    // Guarda el documento en PostgreSQL
     public Documento saveDocumento(String gridFsFileId, String titulo, Integer proyectoId, Integer usuarioId) {
         Documento documento = new Documento();
         documento.setTitulo(titulo);
@@ -72,12 +74,13 @@ public class DocumentoService {
 
     // Actualiza un documento existente y crea una nueva versión
     @Transactional
-    public Documento updateDocumento(Integer documentoId, MultipartFile file, String nuevoTitulo, Integer usuarioId, String detallesCambios) 
+    public Documento updateDocumento(Integer documentoId, MultipartFile file, String nuevoTitulo,
+                                     Integer usuarioId, String detallesCambios)
             throws IOException {
         Documento documentoAct = documentoRepository.findById(documentoId)
                 .orElseThrow(() -> new RuntimeException("Documento no encontrado con ID: " + documentoId));
-        
-        // Guarda la versión actual antes de que actualicemos el documento
+
+        // Guarda la versión actual antes de actualizar el documento
         VersionDocumento versionDoc = new VersionDocumento();
         versionDoc.setDocumentoId(documentoId);
         versionDoc.setTituloDocumento(documentoAct.getTitulo());
@@ -86,7 +89,6 @@ public class DocumentoService {
         versionDocumentoRepository.save(versionDoc);
 
         ObjectId fileId;
-        // Sube el nuevo archivo a GridFS
         try (InputStream inputStream = file.getInputStream()) {
             DBObject metadata = new BasicDBObject();
             metadata.put("contentType", file.getContentType());
@@ -94,7 +96,6 @@ public class DocumentoService {
             fileId = gridFsTemplate.store(inputStream, file.getOriginalFilename(), file.getContentType(), metadata);
         }
 
-        // Actualiza los datos del documento actual
         documentoAct.setTitulo(nuevoTitulo);
         documentoAct.setRutaDoc(fileId.toHexString());
         documentoAct.setFechaModificacion(new Date(System.currentTimeMillis()));
@@ -110,7 +111,14 @@ public class DocumentoService {
 
     // Descarga el archivo de GridFS por su ID
     public GridFsResource downloadByGridFsId(String gridFsId) throws IOException {
-        GridFSFile gridFsFile = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(new ObjectId(gridFsId))));
+        GridFSFile gridFsFile = gridFsTemplate.findOne(
+                new Query(Criteria.where("_id").is(new ObjectId(gridFsId)))
+        );
+
+        if (gridFsFile == null) {
+            throw new IOException("Archivo no encontrado en GridFS con ID: " + gridFsId);
+        }
+
         return gridFsTemplate.getResource(gridFsFile);
     }
 }

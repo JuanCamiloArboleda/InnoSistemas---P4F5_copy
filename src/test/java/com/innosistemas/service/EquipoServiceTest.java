@@ -85,13 +85,13 @@ class EquipoServiceTest {
                 .thenReturn(Optional.empty());
 
         // Act & Assert
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> {
-            equipoService.createEquipoConUsuarios(
-                    "nombre",
-                    "desc",
-                    Collections.singletonList("noexiste@ejemplo.com")
-            );
-        });
+        RuntimeException ex = assertThrows(RuntimeException.class,
+            () -> equipoService.createEquipoConUsuarios(
+                "nombre",
+                "desc",
+                Collections.singletonList("noexiste@ejemplo.com")
+            )
+        );
         assertTrue(ex.getMessage().contains("Usuario no encontrado"));
     }
 } 

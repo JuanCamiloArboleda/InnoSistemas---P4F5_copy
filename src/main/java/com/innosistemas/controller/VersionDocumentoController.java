@@ -33,7 +33,7 @@ public class VersionDocumentoController {
     }
 
     @PostMapping("/{documentoId}/versiones")
-    public ResponseEntity<?> obtenerVersionesDocumento(@PathVariable Integer documentoId, Authentication authentication) {
+    public ResponseEntity<List<VersionDocumento>> obtenerVersionesDocumento(@PathVariable Integer documentoId, Authentication authentication) {
         // Primero verificamos que el usuario tenga permiso para ver las versiones del
         // documento
         Documento doc = documentoRepository.findById(documentoId)
@@ -43,8 +43,7 @@ public class VersionDocumentoController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (!authorizationService.tieneAccesoAProyecto(usuario.getId(), doc.getProyectoId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("No tienes permiso para ver las versiones de este documento.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } else {
             // Usuario autorizado, procedemos a obtener las versiones
             List<VersionDocumento> versiones = versionDocumentoService.obtenerVersionesDocumento(documentoId);

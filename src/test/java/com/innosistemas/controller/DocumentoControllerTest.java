@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class DocumentoControllerTest {
     @Test
     void testUploadDocumentoThrowsException() throws Exception {
-        // Arrange
+    // Arrange
         MultipartFile file = mock(MultipartFile.class);
         String titulo = "DocTest";
         Integer proyectoId = 1;
@@ -35,17 +35,17 @@ class DocumentoControllerTest {
         when(authorizationService.tieneAccesoAProyecto(10, proyectoId)).thenReturn(true);
         when(documentoService.uploadAndSaveDocumento(file, titulo, proyectoId, 10)).thenThrow(new RuntimeException("Error interno"));
 
-        // Act
+    // Act
         ResponseEntity<?> response = documentoController.uploadDocumento(file, titulo, proyectoId, authentication);
 
-        // Assert
+    // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     void testUpdateDocumentoUsuarioNoAutorizado() throws Exception {
-        // Arrange
+    // Arrange
         Integer documentoId = 1;
         MultipartFile file = mock(MultipartFile.class);
         String nuevoTitulo = "Nuevo";
@@ -62,17 +62,17 @@ class DocumentoControllerTest {
         when(usuarioRepository.findByCorreo("user@test.com")).thenReturn(java.util.Optional.of(usuario));
         when(authorizationService.tieneAccesoAProyecto(10, 2)).thenReturn(false);
 
-        // Act
+    // Act
         ResponseEntity<?> response = documentoController.updateDocumento(documentoId, file, nuevoTitulo, detallesCambios, authentication);
 
-        // Assert
+    // Assert
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     void testUpdateDocumentoThrowsException() throws Exception {
-        // Arrange
+    // Arrange
         Integer documentoId = 1;
         MultipartFile file = mock(MultipartFile.class);
         String nuevoTitulo = "Nuevo";
@@ -90,17 +90,17 @@ class DocumentoControllerTest {
         when(authorizationService.tieneAccesoAProyecto(10, 2)).thenReturn(true);
         when(documentoService.updateDocumento(documentoId, file, nuevoTitulo, 10, detallesCambios)).thenThrow(new RuntimeException("Error interno"));
 
-        // Act
+    // Act
         ResponseEntity<?> response = documentoController.updateDocumento(documentoId, file, nuevoTitulo, detallesCambios, authentication);
 
-        // Assert
+    // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     void testGetDocumentosPorProyectoUsuarioNoAutorizado() {
-        // Arrange
+    // Arrange
         Integer proyectoId = 1;
         Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("user@test.com");
@@ -110,17 +110,17 @@ class DocumentoControllerTest {
         when(usuarioRepository.findByCorreo("user@test.com")).thenReturn(java.util.Optional.of(usuario));
         when(authorizationService.tieneAccesoAProyecto(10, proyectoId)).thenReturn(false);
 
-        // Act
+    // Act
         ResponseEntity<?> response = documentoController.getDocumentosPorProyecto(proyectoId, authentication);
 
-        // Assert
+    // Assert
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     void testGetDocumentosPorProyectoThrowsException() {
-        // Arrange
+    // Arrange
         Integer proyectoId = 1;
         Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("user@test.com");
@@ -131,10 +131,10 @@ class DocumentoControllerTest {
         when(authorizationService.tieneAccesoAProyecto(10, proyectoId)).thenReturn(true);
         when(documentoService.findAllDocumentosByProyectoId(proyectoId)).thenThrow(new RuntimeException("Error interno"));
 
-        // Act
+    // Act
         ResponseEntity<?> response = documentoController.getDocumentosPorProyecto(proyectoId, authentication);
 
-        // Assert
+    // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
     }
@@ -156,7 +156,7 @@ class DocumentoControllerTest {
 
     @Test
     void testUploadDocumentoUsuarioAutorizado() throws Exception {
-        // Arrange:
+    // Arrange
         MultipartFile file = mock(MultipartFile.class);
         String titulo = "DocTest";
         Integer proyectoId = 1;
@@ -172,10 +172,10 @@ class DocumentoControllerTest {
         docMock.setTitulo(titulo);
         when(documentoService.uploadAndSaveDocumento(file, titulo, proyectoId, 10)).thenReturn(docMock);
 
-        // Act:
+    // Act
         ResponseEntity<?> response = documentoController.uploadDocumento(file, titulo, proyectoId, authentication);
 
-        // Assert:
+    // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertTrue(response.getBody() instanceof Documento);
         assertEquals(5, ((Documento) response.getBody()).getId());
@@ -199,9 +199,9 @@ class DocumentoControllerTest {
         // Act:
         ResponseEntity<?> response = documentoController.uploadDocumento(file, titulo, proyectoId, authentication);
 
-    // Assert:
-    assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-    assertNull(response.getBody());
-    verify(documentoService, never()).uploadAndSaveDocumento(any(), any(), any(), any());
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(documentoService, never()).uploadAndSaveDocumento(any(), any(), any(), any());
     }
 }

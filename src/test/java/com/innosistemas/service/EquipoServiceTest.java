@@ -94,4 +94,4 @@ class EquipoServiceTest {
         });
         assertTrue(ex.getMessage().contains("Usuario no encontrado"));
     }
-} // ✅ Cierre de la clase añadido correctamente
+} 

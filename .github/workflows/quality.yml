@@ -27,11 +27,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # Ejecuta pruebas y genera jacoco.xml
       - name: Build and Test with Coverage
         run: mvn -B clean verify jacoco:report
 
-      # Ejecuta el análisis en SonarCloud
       - name: SonarCloud Scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
